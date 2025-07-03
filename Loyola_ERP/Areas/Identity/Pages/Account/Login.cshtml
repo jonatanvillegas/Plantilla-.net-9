@@ -2,79 +2,89 @@
 @model LoginModel
 
 @{
-    ViewData["Title"] = "Log in";
+    ViewData["Title"] = "Iniciar sesión";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <form id="account" method="post">
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
-                    </label>
-                </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div>
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
-            </form>
-        </section>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+<div class="auth-box d-flex align-items-center">
+    <div class="container-xxl">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-xl-10">
+                <div class="card rounded-4">
+                    <div class="row justify-content-between g-0">
+                        <div class="col-lg-6">
+                            <div class="card-body">
+                                <div class="auth-brand text-center mb-4">
+                                    <a href="/" class="logo-dark">
+                                        <img src="~/images/logo-black.png" alt="dark logo" height="32">
+                                    </a>
+                                    <a href="/" class="logo-light">
+                                        <img src="~/images/logo.png" alt="logo" height="32">
+                                    </a>
+                                    <h4 class="fw-bold mt-4">ERP Loyola</h4>
+                                    <p class="text-muted w-lg-75 mx-auto">Inicia sesión con tu correo y contraseña.</p>
+                                </div>
+
+                                <form id="account" method="post">
+                                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="Input.Email" class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="ti ti-mail text-muted fs-xl"></i>
+                                            </span>
+                                            <input asp-for="Input.Email" class="form-control" placeholder="you@example.com" autocomplete="username" />
+                                        </div>
+                                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="Input.Password" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="ti ti-lock-password text-muted fs-xl"></i>
+                                            </span>
+                                            <input asp-for="Input.Password" class="form-control" placeholder="••••••••" autocomplete="current-password" />
+                                        </div>
+                                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input form-check-input-light fs-14" asp-for="Input.RememberMe" />
+                                            <label class="form-check-label" asp-for="Input.RememberMe">
+                                                @Html.DisplayNameFor(m => m.Input.RememberMe)
+                                            </label>
+                                        </div>
+                                        <a asp-page="./ForgotPassword" class="text-decoration-underline link-offset-3 text-muted">¿Olvidaste tu contraseña?</a>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button id="login-submit" type="submit" class="btn btn-primary fw-semibold py-2">Iniciar sesión</button>
+                                    </div>
+                                </form>
+
+                                <p class="text-muted text-center mt-4 mb-0">
+                                    ¿Eres nuevo? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-underline link-offset-3 fw-semibold">Crea una cuenta</a>
+                                </p>
+
+                                <p class="text-center text-muted mt-4 mb-0">                                   
+                                    <script>document.write(new Date().getFullYear())</script> ERP Loyola<span class="fw-semibold">Desarrolladores</span>
+                                </p>
+                            </div>
                         </div>
-                    </form>
-                }
-            }
-        </section>
+
+                        <div class="col-lg-6 d-none d-lg-block">
+                            <div class="h-100 position-relative card-side-img rounded-end-4 overflow-hidden">
+                                <div class="p-4 card-img-overlay rounded-4 auth-overlay d-flex align-items-end justify-content-center">                                  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
