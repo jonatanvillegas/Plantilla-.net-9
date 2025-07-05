@@ -15,7 +15,8 @@ namespace Loyola_ERP.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            //return View();
+            return RedirectToAction("Index", "Wellcome", new { Area = "Home" });
         }
 
         public IActionResult Privacy()

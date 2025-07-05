@@ -22,7 +22,7 @@ builder.Services.AddControllersWithViews()
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
 
-builder.Services.AddRazorPages().AddNewtonsoftJson();
+builder.Services.AddRazorPages();
 builder.Services.AddHttpClient();
 
 builder.Services.AddAuthorization(options =>
@@ -52,14 +52,16 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-//app.MapStaticAssets();
+
+
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Wellcome}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages()
-   .WithStaticAssets();
+app.MapRazorPages();
 
 app.Run();
