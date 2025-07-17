@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DAL.UnitOfWork
 {
-    public class UnidOfWork : IUnidOfWork
+    public class UnitOfWork : IUnitOfWork
     {
 
         protected readonly SchoolManagementContext _context;
@@ -19,7 +19,7 @@ namespace DAL.UnitOfWork
         private  IAcademicoRepository _academicoRepository;
 
 
-        public UnidOfWork(SchoolManagementContext context)
+        public UnitOfWork(SchoolManagementContext context)
         {
            _context = context;
         }

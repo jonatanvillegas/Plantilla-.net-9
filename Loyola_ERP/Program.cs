@@ -32,7 +32,7 @@ builder.Services.AddControllersWithViews()
     });
 
 builder.Services.AddScoped<IApplicationUser, ApplicationUser>();
-builder.Services.AddScoped<IUnidOfWork, UnidOfWork>(); 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(); 
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddRazorPages();

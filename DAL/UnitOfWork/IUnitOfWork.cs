@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DAL.UnitOfWork
 {
-    public interface IUnidOfWork:IDisposable
+    public interface IUnitOfWork:IDisposable
     {
         IAcademicoRepository Academico { get;}
     }
