@@ -49,6 +49,7 @@ builder.Services.AddProgressiveWebApp();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.LoginPath = "/Identity/Account/Login"; // asegura HTTPS
 });
 
 var app = builder.Build();
@@ -73,9 +74,10 @@ app.Use(async (context, next) =>
     var path = context.Request.Path.Value;
 
     if (path != null &&
-        (path.EndsWith("manifest.json") || path.StartsWith("/icons/")))
+        (path.EndsWith("manifest.webmanifest") || path.EndsWith("manifest.json") || path.StartsWith("/icons/")))
     {
-        await next(); // permitir acceso sin auth
+        // Permitir acceso público sin login
+        await next();
         return;
     }
 
