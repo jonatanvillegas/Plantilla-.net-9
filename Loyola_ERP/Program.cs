@@ -62,6 +62,20 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+// Permitir acceso público a PWA
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value;
+
+    if (path != null &&
+        (path.EndsWith("manifest.json") || path.StartsWith("/icons/")))
+    {
+        await next(); // permitir acceso sin auth
+        return;
+    }
+
+    await next();
+});
 app.UseRouting();
 
 app.UseAuthentication();
