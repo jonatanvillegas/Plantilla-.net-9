@@ -6,7 +6,7 @@
     <h2 class="mb-4 text-success">Listado de productos</h2>
     <div class="card mb-4 shadow-sm">
         <div class="card-body">
-            <form id="formNuevoProducto" class="row g-3">
+            <form id="formFiltros" class="row g-3 align-items-end">
                 <div class="col-md-4">
                     <label for="nombre" class="form-label fw-bold">Buscar por nombre:</label>
                     <input type="text" class="form-control" id="nombre" placeholder="Escriba para buscar..." autocomplete="off">
@@ -20,9 +20,13 @@
                         <option value="Inactivo">Inactivo</option>
                     </select>
                 </div>
-                <div class="col-md-2 d-grid">
-                    <a href="@Url.Action("Producto", "Productos", new { area = "Producto" })" class="btn btn-secondary">Crear producto</a>
+
+                <div class="col-md-2">
+                    <a href="@Url.Action("Producto", "Productos", new { area = "Producto" })" class="btn btn-secondary">
+                        Crear producto
+                    </a>
                 </div>
+
             </form>
         </div>
        
