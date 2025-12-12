@@ -37,7 +37,7 @@
     background: white;
     border-radius: 12px;
     padding: 20px;
-    height: calc(100vh - 40px); /* Ocupa el espacio restante de la pantalla */
+    height: calc(100vh - 100px); /* Ocupa el espacio restante de la pantalla */
     overflow-y: auto;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
@@ -83,4 +83,15 @@
     font-weight: bold;
 }
 
+
+.panel-venta {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.venta-items {
+    max-height: calc(4 * 72px); /* 72px por item aprox */
+    overflow-y: auto;
+}
 
