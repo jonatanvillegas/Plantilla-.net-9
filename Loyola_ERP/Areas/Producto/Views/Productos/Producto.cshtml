@@ -50,16 +50,33 @@
                     </div>
 
                     <!-- IMAGEN DEL PRODUCTO -->
-                    <div class="card mt-3">
-                        <div class="card-header p-3">
-                            <h4 class="card-title mb-1">Imagen del producto</h4>
-                            <p class="text-muted mb-0">Subir imagen del producto.</p>
-                        </div>
-
+                    <div class="card shadow-sm mt-3">
                         <div class="card-body">
-                            <div class="dropzone-previews mt-3" id="file-previews"></div>
+                            <h6 class="card-title mb-3">Imagen del Producto</h6>
+
+                            <div class="mb-3">
+                                <label for="imagenFile" class="form-label fw-semibold">Seleccionar Imagen</label>
+                                <input type="file" id="imagenFile" name="imagenFile" accept="image/*" class="form-control" />
+                            </div>
+
+                            <!-- Vista Previa -->
+                            <div class="text-center">
+                                <img id="previewImagen"
+                                     src="#"
+                                     style="max-width: 180px;
+                        max-height: 180px;
+                        display: none;
+                        border: 2px solid #e0e0e0;
+                        padding: 6px;
+                        border-radius: 10px;
+                        object-fit: cover;
+                        background: #fafafa;">
+                            </div>
+
+                            <input type="hidden" id="productoId" value="@Model?.Id" />
                         </div>
                     </div>
+
 
                 </div>
 
@@ -135,7 +152,7 @@
                     select.append(`<option value="${item.id}" ${selected}>${item.nombre}</option>`);
                 });
 
-            }); 
+            });
 
             $("#btnGuardar").click(function () {
 
@@ -145,6 +162,9 @@
                 const stock = $("#stock").val().trim();
                 const precio = $("#precio").val().trim();
                 const estadoId = $("#estado").val();
+
+                // 2. Obtener la referencia al archivo
+                const imagenFile = document.getElementById("imagenFile").files[0];
 
                 if (nombre === "" || codigo === "" || stock === "" || precio === "" || estadoId === "") {
 
@@ -169,20 +189,27 @@
 
                     return;
                 }
-                const data = {
-                    Id: parseInt($("#productoId").val()) || 0,
-                    Nombre: nombre,
-                    Codigo: codigo,
-                    Stock: parseInt(stock),
-                    Precio: parseFloat(precio),
-                    EstadoId: parseInt(estadoId)
-                };
+
+                const formData = new FormData();
+                // Añadir los campos de texto/número
+                formData.append('Id', parseInt($("#productoId").val()) || 0);
+                formData.append('Nombre', nombre);
+                formData.append('Codigo', codigo);
+                formData.append('Stock', parseInt(stock));
+                formData.append('Precio', parseFloat(precio));
+                formData.append('EstadoId', parseInt(estadoId));
+
+                // Añadir el archivo SOLO si existe
+                if (imagenFile) {
+                    formData.append('imagenFile', imagenFile);
+                }
 
                 $.ajax({
                     url: '@Url.Action("GuardarProducto", "Productos", new { area = "Producto" })',
                     type: "POST",
-                    contentType: "application/json",
-                    data: JSON.stringify(data),
+                    data: formData,
+                    contentType: false,
+                    processData: false,
                     success: function (resp) {
 
                         Swal.fire({
@@ -212,9 +239,33 @@
                         });
                     }
                 });
+            });
 
-            }); 
+            // ================================
+            //   ⚡ VISTA PREVIA DE LA IMAGEN
+            // ================================
+            $("#imagenFile").change(function () {
+                const input = this;
+                const preview = $("#previewImagen");
+
+                if (input.files && input.files[0]) {
+
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        preview.attr("src", e.target.result);
+                        preview.show();
+                    };
+
+                    reader.readAsDataURL(input.files[0]);
+
+                } else {
+                    preview.hide();
+                    preview.attr("src", "#");
+                }
+            });
 
         });
     </script>
+
 }
