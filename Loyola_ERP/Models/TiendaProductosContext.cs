@@ -92,6 +92,7 @@ public partial class TiendaProductosContext : DbContext
             entity.Property(e => e.Codigo)
                 .IsRequired()
                 .HasMaxLength(50);
+            entity.Property(e => e.Imagen).HasMaxLength(255);
             entity.Property(e => e.Nombre)
                 .IsRequired()
                 .HasMaxLength(150);

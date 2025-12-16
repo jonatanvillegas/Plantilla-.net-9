@@ -1,8 +1,13 @@
-﻿using UI.Models; 
+﻿using Loyola_ERP.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Loyola_ERP.Data;
+using Microsoft.Extensions.Hosting;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 using System.Linq;
+using UI.Models;
+using UI.Services;
+using static System.Net.Mime.MediaTypeNames;
 
 
 namespace UI.Areas.Producto.Controllers
@@ -11,10 +16,14 @@ namespace UI.Areas.Producto.Controllers
     public class ProductosController : Controller
     {
         private readonly TiendaProductosContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly IProductoService _productoService;
 
-        public ProductosController(TiendaProductosContext context)
+        public ProductosController(TiendaProductosContext context, IWebHostEnvironment hostEnvironment, IProductoService productoService)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
+            _productoService = productoService;
         }
         public IActionResult ListadoProductos()
         {
@@ -29,38 +38,80 @@ namespace UI.Areas.Producto.Controllers
             }
             return View(producto);
         }
+
         [HttpPost]
-        public async Task<IActionResult> GuardarProducto([FromBody] Productos modelo)
+        public async Task<IActionResult> GuardarProducto(Productos model, IFormFile imagenFile)
         {
-            if (modelo.Id > 0)
+            // <-- Abre el bloque try que envuelve la lógica principal -->
+            try
             {
-                var productoExistente = await _context.Productos.FindAsync(modelo.Id);
-                if (productoExistente != null)
+                if (!ModelState.IsValid)
+                    return View("CrearEditar", model);
+
+                // SI SUBIÓ IMAGEN
+                if (imagenFile != null && imagenFile.Length > 0)
                 {
-                    productoExistente.Nombre = modelo.Nombre;
-                    productoExistente.Codigo = modelo.Codigo;
-                    productoExistente.Stock = modelo.Stock;
-                    productoExistente.Precio = modelo.Precio;
-                    productoExistente.EstadoId = modelo.EstadoId;
+                    var uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "imagenes/productos");
 
-                    _context.Productos.Update(productoExistente);
-                    await _context.SaveChangesAsync();
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
 
-                    return Json(new { mensaje = "Producto actualizado exitosamente." });
+                    var extension = ".jpg"; // si quieres puedes permitir otras
+                    var fileName = $"{Guid.NewGuid()}{extension}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var image = SixLabors.ImageSharp.Image.Load(imagenFile.OpenReadStream()))
+                    {
+                        // 🔥 COMPRESIÓN Y REDIMENSIONADO (ajustado para móviles)
+                        int maxWidth = 800;  // tamaño ideal para responsivo
+                        int maxHeight = 800;
+
+                        image.Mutate(x => x.Resize(new ResizeOptions
+                        {
+                            Mode = ResizeMode.Max,
+                            Size = new Size(maxWidth, maxHeight)
+                        }));
+
+                        // 🔥 GUARDAR COMO JPG OPTIMIZADO (MUY LIVIANO)
+                        var encoder = new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder
+                        {
+                            Quality = 75 // (0-100) 75 = recomendado
+                        };
+
+                        await image.SaveAsync(filePath, encoder);
+                    }
+
+                    // GUARDAR NOMBRE DE ARCHIVO EN BD
+                    var producto = new Productos
+                    {
+                        Id = model.Id,
+                        Nombre = model.Nombre,
+                        Codigo = model.Codigo,
+                        Stock = model.Stock,
+                        Precio = model.Precio,
+                        EstadoId = model.EstadoId,
+                        Imagen = fileName // Guardar nombre de la imagen en BD
+                    };
+
+                    await _productoService.Guardar(producto);
+
+                    return Json(new { mensaje = "Guardado correctamente", ok = true });
                 }
                 else
                 {
-                    return Json(new { mensaje = "Producto no encontrado." });
+                    // Si no se sube imagen, se sigue la lógica original de guardado/actualización
+                    // usando el modelo que viene del formulario.
+                    await _productoService.Guardar(model);
+                    return Json(new { mensaje = "Guardado correctamente", ok = true });
                 }
             }
-            else
+            // <-- Cierra el bloque try, y aquí empieza el catch -->
+            catch (Exception ex)
             {
-                await _context.Productos.AddAsync(modelo);
-                await _context.SaveChangesAsync();
-
-                return Json(new { mensaje = "Producto guardado exitosamente." });
+                return BadRequest(new { mensaje = "Error: " + ex.Message });
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> ListarProductos()
         {

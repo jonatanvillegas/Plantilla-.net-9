@@ -19,5 +19,7 @@ public partial class Productos
 
     public int EstadoId { get; set; }
 
+    public string Imagen { get; set; }
+
     public virtual Estados Estado { get; set; }
 }
