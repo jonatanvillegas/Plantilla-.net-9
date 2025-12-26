@@ -1,10 +1,10 @@
-
 using Loyola_ERP.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
+using UI.Areas.Producto.Controllers;
 using UI.Models;
 using UI.Services;
 
@@ -17,7 +17,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 builder.Services.AddSqlServer<TiendaProductosContext>(connectionString);
 
 
+
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -51,6 +54,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.LoginPath = "/Identity/Account/Login"; // asegura HTTPS
 });
+
+builder.Services.AddScoped<IProductoService, ProductoService>();
+
 
 var app = builder.Build();
 
@@ -100,3 +106,4 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
